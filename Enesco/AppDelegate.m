@@ -10,6 +10,8 @@
 #import "MusicListViewController.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "MusicViewController.h"
+#import <AVFoundation/AVFoundation.h>
+#import "MBProgressHUD.h"
 
 @interface AppDelegate ()
 @property (nonatomic, strong) MusicListViewController *musicListVC;
@@ -81,5 +83,49 @@
     }
 }
 
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_9_0
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(nullable NSString *)sourceApplication annotation:(id)annotation
+{
+    NSString *fileName = [[url absoluteString] lastPathComponent];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *desMusicPath = [documentsPath stringByAppendingPathComponent:fileName];
+    NSURL *desUrl = [NSURL fileURLWithPath:desMusicPath];
+    
+    NSError *error;
+    if (![fileManager moveItemAtURL:url toURL:desUrl error:&error]) {
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.window animated:YES];
+        [hud hideAnimated:YES afterDelay:0.5];
+    }
+    
+    return YES;
+}
+#else
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options
+{
+//    UINavigationController *navigation = (UINavigationController *)application.keyWindow.rootViewController;
+//    ViewController *displayController = (ViewController *)navigation.topViewController;
+//    
+//    [displayController.imageView setImage:[UIImage imageWithData:[NSData dataWithContentsOfURL:url]]];
+//    [displayController.label setText:[options objectForKey:UIApplicationOpenURLOptionsSourceApplicationKey]];
+    
+    NSString *fileName = [[url absoluteString] lastPathComponent];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *desMusicPath = [documentsPath stringByAppendingPathComponent:fileName];
+    NSURL *desUrl = [NSURL fileURLWithPath:desMusicPath];
+    
+    NSError *error;
+    if (![fileManager moveItemAtURL:url toURL:desUrl error:&error]) {
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.window animated:YES];
+        [hud hideAnimated:YES afterDelay:0.5];
+    }
+    
+    return YES;
+}
+#endif
 
 @end
