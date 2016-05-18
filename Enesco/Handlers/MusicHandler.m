@@ -37,7 +37,10 @@
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
         MusicEntity *music = [MusicViewController sharedInstance].currentPlayingMusic;
         
-        AVURLAsset *audioAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:music.musicUrl] options:nil];
+        NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+        NSString *path = [documentsPath stringByAppendingPathComponent:music.musicUrl];
+        
+        AVURLAsset *audioAsset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:path] options:nil];
         CMTime audioDuration = audioAsset.duration;
         float audioDurationSeconds = CMTimeGetSeconds(audioDuration);
         
@@ -47,10 +50,14 @@
         [dict setObject:@(audioDurationSeconds) forKey:MPMediaItemPropertyPlaybackDuration];
         CGFloat playerAlbumWidth = (SCREEN_WIDTH - 16) * 2;
         UIImageView *playerAlbum = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, playerAlbumWidth, playerAlbumWidth)];
+        playerAlbum.backgroundColor = [UIColor blackColor];
         UIImage *placeholderImage = [UIImage imageNamed:@"music_lock_screen_placeholder"];
+        
+#if 0
         NSURL *URL = [BaseHelper qiniuImageCenter:music.cover
                                         withWidth:[NSString stringWithFormat:@"%.f", playerAlbumWidth]
                                        withHeight:[NSString stringWithFormat:@"%.f", playerAlbumWidth]];
+        
         [playerAlbum sd_setImageWithURL:URL
                        placeholderImage:placeholderImage
                               completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
@@ -63,6 +70,12 @@
                                   [dict setObject:artwork forKey:MPMediaItemPropertyArtwork];
                                   [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dict];
                               }];
+#else
+        MPMediaItemArtwork *artwork = [[MPMediaItemArtwork alloc] initWithImage:placeholderImage];
+        playerAlbum.contentMode = UIViewContentModeScaleAspectFill;
+        [dict setObject:artwork forKey:MPMediaItemPropertyArtwork];
+        [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dict];
+#endif
         
     }
 }

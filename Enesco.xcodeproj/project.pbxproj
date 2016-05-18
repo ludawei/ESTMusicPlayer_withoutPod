@@ -1045,7 +1045,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dawei.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "d9f45349-490c-466a-af7c-f1e9296a8bfe";
+				PROVISIONING_PROFILE = "487c263d-0869-4fcb-bfd0-6caef7b1c4c3";
 			};
 			name = Debug;
 		};
@@ -1059,7 +1059,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dawei.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "d9f45349-490c-466a-af7c-f1e9296a8bfe";
+				PROVISIONING_PROFILE = "487c263d-0869-4fcb-bfd0-6caef7b1c4c3";
 			};
 			name = Release;
 		};
