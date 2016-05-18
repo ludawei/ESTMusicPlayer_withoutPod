@@ -195,7 +195,7 @@
         [_delegate playMusicWithSpecialIndex:indexPath.row];
     } else {
         MusicViewController *musicVC = [MusicViewController sharedInstance];
-        musicVC.musicTitle = self.navigationItem.title;
+//        musicVC.musicTitle = self.navigationItem.title;
         musicVC.musicEntities = _musicEntities;
         musicVC.specialIndex = indexPath.row;
         musicVC.delegate = self;

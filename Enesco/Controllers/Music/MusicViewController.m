@@ -18,6 +18,8 @@
 #import "NSString+Additions.h"
 #import "MBProgressHUD.h"
 
+#import <AVFoundation/AVFoundation.h>
+
 static void *kStatusKVOKey = &kStatusKVOKey;
 static void *kDurationKVOKey = &kDurationKVOKey;
 static void *kBufferingRatioKVOKey = &kBufferingRatioKVOKey;
@@ -131,9 +133,11 @@ static void *kBufferingRatioKVOKey = &kBufferingRatioKVOKey;
 
 - (void)setupMusicViewWithMusicEntity:(MusicEntity *)entity {
     _musicEntity = entity;
+    self.musicTitle = entity.albumName;
+    
     _musicNameLabel.text = _musicEntity.name;
     _singerLabel.text = _musicEntity.artistName;
-    _musicTitleLabel.text = _musicEntity.albumName?_musicEntity.albumName:_musicTitle;
+    _musicTitleLabel.text = _musicTitle;
     [self setupBackgroudImage];
     [self checkMusicFavoritedIcon];
 }
@@ -181,7 +185,8 @@ static void *kBufferingRatioKVOKey = &kBufferingRatioKVOKey;
     NSString *imageWidth = [NSString stringWithFormat:@"%.f", (SCREEN_WIDTH - 70) * 2];
     NSURL *imageUrl = [BaseHelper qiniuImageCenter:_musicEntity.cover withWidth:imageWidth withHeight:imageWidth];
     [_backgroudImageView sd_setImageWithURL:imageUrl placeholderImage:[UIImage imageNamed:@"music_placeholder"]];
-    [_albumImageView sd_setImageWithURL:imageUrl placeholderImage:[UIImage imageNamed:@"music_placeholder"]];
+//    [_albumImageView sd_setImageWithURL:imageUrl placeholderImage:[UIImage imageNamed:@"music_placeholder"]];
+    [_albumImageView setImage:[self mp3CoverImageFromFile]];
     
     if(![_visualEffectView isDescendantOfView:_backgroudView]) {
         UIVisualEffect *blurEffect;
@@ -195,6 +200,37 @@ static void *kBufferingRatioKVOKey = &kBufferingRatioKVOKey;
     [_backgroudImageView startTransitionAnimation];
     [_albumImageView startTransitionAnimation];
 }
+
+
+-(UIImage *)mp3CoverImageFromFile
+{
+    NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *path = [documentsPath stringByAppendingPathComponent:_musicEntity.musicUrl];
+    
+    UIImage *img = nil;
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSURL *fileURL = [NSURL fileURLWithPath:path];
+        AVURLAsset *avURLAsset = [[AVURLAsset alloc] initWithURL:fileURL options:nil];
+        for(NSString *format in [avURLAsset availableMetadataFormats])
+        {
+            for (AVMetadataItem *metadata in [avURLAsset metadataForFormat:format])
+            {
+                if([metadata.commonKey isEqualToString:@"artwork"])
+                {
+                    UIImage *coverImage = [UIImage imageWithData:(NSData *)metadata.value];//提取图片
+                    if (coverImage) {
+                        img = coverImage;
+                    }
+                }
+                
+            }
+        }
+    }
+    
+    return img;
+}
+
 
 - (void)addPanRecognizer {
     UISwipeGestureRecognizer *swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchDismissButton:)];
