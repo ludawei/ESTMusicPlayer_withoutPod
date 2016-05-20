@@ -17,7 +17,7 @@
 @end
 
 @interface MusicViewController : UIViewController
-@property (nonatomic, strong) NSMutableArray *musicEntities;
+@property (nonatomic, strong) NSArray *musicEntities;
 @property (nonatomic, copy) NSString *musicTitle;
 @property (nonatomic, strong) DOUAudioStreamer *streamer;
 @property (nonatomic, assign) BOOL dontReloadMusic;

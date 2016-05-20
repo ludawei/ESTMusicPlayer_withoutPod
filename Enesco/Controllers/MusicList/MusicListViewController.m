@@ -17,6 +17,7 @@
 @interface MusicListViewController () <MusicViewControllerDelegate, MusicListCellDelegate>
 @property (nonatomic, strong) NSArray *musicEntities;
 @property (nonatomic, assign) NSInteger currentIndex;
+@property (nonatomic, strong) UIActivityIndicatorView *actView;
 @end
 
 @implementation MusicListViewController
@@ -25,7 +26,13 @@
     [super viewDidLoad];
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     self.navigationItem.title = @"for me";
-    [self headerRefreshing];
+    
+    [self.actView startAnimating];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self headerRefreshing];
+        
+        [self.actView stopAnimating];
+    });
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -262,16 +269,27 @@
 # pragma mark - HUD
          
 - (void)showMiddleHint:(NSString *)hint {
-     UIView *view = [[UIApplication sharedApplication].delegate window];
-     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
-     hud.userInteractionEnabled = NO;
-     hud.mode = MBProgressHUDModeText;
-     hud.labelText = hint;
-     hud.labelFont = [UIFont systemFontOfSize:15];
-     hud.margin = 10.f;
-     hud.yOffset = 0;
-     hud.removeFromSuperViewOnHide = YES;
-     [hud hide:YES afterDelay:2];
+    UIView *view = [[UIApplication sharedApplication].delegate window];
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
+    hud.userInteractionEnabled = NO;
+    hud.mode = MBProgressHUDModeText;
+    hud.label.text = hint;
+    hud.label.font= [UIFont systemFontOfSize:15];
+    hud.margin = 10.f;
+    hud.removeFromSuperViewOnHide = YES;
+    [hud hideAnimated:YES afterDelay:2];
+}
+
+-(UIActivityIndicatorView *)actView
+{
+    if (!_actView) {
+        _actView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _actView.center = CGPointMake(self.view.center.x, _actView.frame.size.height/2 + 10);
+        _actView.hidesWhenStopped = YES;
+        [self.view addSubview:_actView];
+    }
+    
+    return _actView;
 }
 
 @end
