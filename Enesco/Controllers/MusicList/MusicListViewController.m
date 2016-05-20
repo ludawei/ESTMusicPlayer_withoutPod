@@ -12,21 +12,26 @@
 #import "MusicIndicator.h"
 #import "MBProgressHUD.h"
 
+#import "UIAlertController+Blocks.h"
 #import <AVFoundation/AVFoundation.h>
 
 @interface MusicListViewController () <MusicViewControllerDelegate, MusicListCellDelegate>
-@property (nonatomic, strong) NSArray *musicEntities;
+@property (nonatomic, strong) NSMutableArray *musicEntities;
 @property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, strong) UIActivityIndicatorView *actView;
+
 @end
 
 @implementation MusicListViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(headerRefreshing) name:@"reloadLocalFiles" object:nil];
+    
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     self.navigationItem.title = @"for me";
-    
+
     [self.actView startAnimating];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self headerRefreshing];
@@ -78,7 +83,7 @@
     NSDictionary *musicsDict = [self dictionaryWithContentsOfJSONString:@"music_list.json"];
     self.musicEntities = [MusicEntity arrayOfEntitiesFromArray:musicsDict[@"data"]].mutableCopy;
 #else
-    self.musicEntities = [MusicEntity arrayOfEntitiesFromArray:[self localMusics]];
+    self.musicEntities = [NSMutableArray arrayWithArray:[MusicEntity arrayOfEntitiesFromArray:[self localMusics]]];
 #endif
     [self.tableView reloadData];
 }
@@ -133,6 +138,33 @@
     }
     
     return [[NSUserDefaults standardUserDefaults] objectForKey:@"localmusics"];
+}
+
+-(BOOL)removeFileWithIndex:(NSInteger)index
+{
+    NSInteger currPlayIndex = [self.musicEntities indexOfObject:[[MusicViewController sharedInstance] currentPlayingMusic]];
+    if (currPlayIndex == index) {
+        [[MusicViewController sharedInstance] playPreviousMusic:nil];
+    }
+    
+    
+    NSMutableArray *savedMusics = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:@"localmusics"]];
+    
+    NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    
+    NSString *filePath = [documentsPath stringByAppendingPathComponent:[[savedMusics objectAtIndex:index] objectForKey:@"music_url"]];
+    if ([[NSFileManager defaultManager] removeItemAtPath:filePath error:nil]) {
+        [savedMusics removeObjectAtIndex:index];
+        
+        [[NSUserDefaults standardUserDefaults] setObject:savedMusics forKey:@"localmusics"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 - (NSDictionary *)dictionaryWithContentsOfJSONString:(NSString *)fileLocation {
@@ -212,6 +244,43 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return @"删除";
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // 从数据源中删除
+//    [_data removeObjectAtIndex:indexPath.row];
+    // 从列表中删除
+//    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    [UIAlertController showAlertInViewController:self withTitle:@"提示" message:@"确定要删除？" cancelButtonTitle:@"取消" destructiveButtonTitle:@"确定" otherButtonTitles:nil tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex) {
+        if (buttonIndex != controller.cancelButtonIndex) {
+            if ([self removeFileWithIndex:indexPath.row]) {
+                [self.musicEntities removeObjectAtIndex:indexPath.row];
+                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                
+                [self showMiddleHint:@"删除成功"];
+            }
+            else
+            {
+                [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                [self showMiddleHint:@"删除失败"];
+            }
+        }
+        else
+        {
+            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        }
+    }];
+}
+
 # pragma mark - Jump to music view
 
 - (void)presentToMusicViewWithMusicVC:(MusicViewController *)musicVC {
@@ -269,15 +338,15 @@
 # pragma mark - HUD
          
 - (void)showMiddleHint:(NSString *)hint {
-    UIView *view = [[UIApplication sharedApplication].delegate window];
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
-    hud.userInteractionEnabled = NO;
-    hud.mode = MBProgressHUDModeText;
-    hud.label.text = hint;
-    hud.label.font= [UIFont systemFontOfSize:15];
-    hud.margin = 10.f;
-    hud.removeFromSuperViewOnHide = YES;
-    [hud hideAnimated:YES afterDelay:2];
+     UIView *view = [[UIApplication sharedApplication].delegate window];
+     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
+     hud.userInteractionEnabled = NO;
+     hud.mode = MBProgressHUDModeText;
+     hud.label.text = hint;
+     hud.label.font = [UIFont systemFontOfSize:15];
+     hud.margin = 10.f;
+     hud.removeFromSuperViewOnHide = YES;
+     [hud hideAnimated:YES afterDelay:2];
 }
 
 -(UIActivityIndicatorView *)actView

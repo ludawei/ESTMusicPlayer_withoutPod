@@ -587,7 +587,10 @@ static void *kBufferingRatioKVOKey = &kBufferingRatioKVOKey;
         _musicEntities = nil;
     }
     
-    return _musicEntities[_currentIndex];
+    if (_currentIndex < _musicEntities.count) {
+        return _musicEntities[_currentIndex];
+    }
+    
+    return nil;
 }
-
 @end

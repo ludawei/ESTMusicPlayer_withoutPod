@@ -88,6 +88,7 @@
 		C14CB06D1CEB78040030102E /* UIImageView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = C14CB05C1CEB78040030102E /* UIImageView+WebCache.m */; };
 		C14CB06E1CEB78040030102E /* UIView+WebCacheOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C14CB05E1CEB78040030102E /* UIView+WebCacheOperation.m */; };
 		C14CB0721CEB78510030102E /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C14CB0711CEB78510030102E /* MBProgressHUD.m */; };
+		C15A17771CEE037F00190B1A /* UIAlertController+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = C15A17761CEE037F00190B1A /* UIAlertController+Blocks.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -274,6 +275,8 @@
 		C14CB05E1CEB78040030102E /* UIView+WebCacheOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+WebCacheOperation.m"; sourceTree = "<group>"; };
 		C14CB0701CEB78510030102E /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		C14CB0711CEB78510030102E /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		C15A17751CEE037F00190B1A /* UIAlertController+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertController+Blocks.h"; sourceTree = "<group>"; };
+		C15A17761CEE037F00190B1A /* UIAlertController+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertController+Blocks.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -508,6 +511,7 @@
 		5643E1E41C0D3907005D1A1C /* Thirdparty */ = {
 			isa = PBXGroup;
 			children = (
+				C15A17741CEE037F00190B1A /* UIAlertController-Block */,
 				C14CB06F1CEB78510030102E /* MBProgressHUD */,
 				C14CB03D1CEB78040030102E /* SDWebImage */,
 				C14CAFCC1CEB76C90030102E /* Mantle */,
@@ -695,6 +699,15 @@
 				C14CB0711CEB78510030102E /* MBProgressHUD.m */,
 			);
 			path = MBProgressHUD;
+			sourceTree = "<group>";
+		};
+		C15A17741CEE037F00190B1A /* UIAlertController-Block */ = {
+			isa = PBXGroup;
+			children = (
+				C15A17751CEE037F00190B1A /* UIAlertController+Blocks.h */,
+				C15A17761CEE037F00190B1A /* UIAlertController+Blocks.m */,
+			);
+			path = "UIAlertController-Block";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -900,6 +913,7 @@
 				C14CB03B1CEB77320030102E /* DOUSimpleHTTPRequest.m in Sources */,
 				5643E1C61C0C3985005D1A1C /* MusicListEntity.m in Sources */,
 				5643E1ED1C0D3907005D1A1C /* Track.m in Sources */,
+				C15A17771CEE037F00190B1A /* UIAlertController+Blocks.m in Sources */,
 				C14CB0001CEB76C90030102E /* NSObject+MTLComparisonAdditions.m in Sources */,
 				C14CB0671CEB78040030102E /* SDWebImagePrefetcher.m in Sources */,
 				C14CAFF21CEB76C90030102E /* EXTRuntimeExtensions.m in Sources */,

@@ -121,7 +121,12 @@
     NSError *error;
     if (![fileManager moveItemAtURL:url toURL:desUrl error:&error]) {
         MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.window animated:YES];
+        hud.label.text = @"copy失败!";
         [hud hideAnimated:YES afterDelay:0.5];
+    }
+    else
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadLocalFiles" object:nil userInfo:nil];
     }
     
     return YES;
